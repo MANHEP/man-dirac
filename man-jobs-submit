@@ -36,7 +36,7 @@ jdl += 'Site = "LCG.UKI-NORTHGRID-MAN-HEP.uk";\n'	# in GridPP DIRAC
 #jdl += 'Site = "VAC.Manchester.uk";\n'			# in LHCb DIRAC
 
 # Allows job to run on local queues (must correspond to tags in DIRAC CS!)
-# jdl += 'Tags = "manchester";\n;
+# jdl += 'Tags = "manchester";\n'
 
 # The script you want to run. 
 jdl += 'Executable = "tarJob.sh";\n'
