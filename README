@@ -1,0 +1,21 @@
+Basic idea
+
+1. Edit man-jobs-submit to suit the script you want to run across your data
+   files
+2. Make sure the data files are on grid storage (use dirac-dms-add-file)
+3. Run man-jobs-submit
+4. Use the DIRAC portal to see how they are getting on (you can select by
+   JobGroup)
+5. Get the results with a command like:
+    dirac-wms-job-get-output --JobGroup andrew.mcnab.20170811164806
+   A directory is created with the output files of each job and each of those
+   directories is created in a directory named after the JobGroup. If you
+   run the command more than once, it uses the existing directories to keep
+   track of what job outputs it has already fetched.
+6. Write a script to merge the outputs of your outputs in all those directories
+   and run the script when they've all finished.
+
+If your output files are big too, you need to use OutputData (see the example
+in man-jobs-submit) and fetch those files using dirac-wms-job-get-output-data
+or dirac-dms-get-file (you can give it a file containing a list of LFNs to
+fetch.)
