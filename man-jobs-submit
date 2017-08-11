@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+#
+# Template for submitting lots of jobs to GridPP DIRAC or LHCb DIRAC
+# Lots of inline comments. Please edit to suit your situation.
+#
+# This script uses DIRAC parametric jobs:
+#  https://github.com/DIRACGrid/DIRAC/wiki/JobManagementAdvanced
+
+import sys
+import time
+
+from DIRAC.Core.Base import Script
+Script.parseCommandLine()
+
+from DIRAC.Core.Security.ProxyInfo import getProxyInfo
+from DIRAC.Interfaces.API.Dirac import Dirac
+
+# We construct the DIRAC Job Description Language as string in jdl:
+jdl = ''
+
+# Something descriptive for the name! Like 'FastRawMerging'.
+jdl += 'JobName = "tarJob";\n'
+
+# One job will be created for each parameter in the list
+jdl += """Parameters = { "LFN:/skatelescope.eu/user/a/andrew.mcnab/skatest/0.tar",
+                         "LFN:/skatelescope.eu/user/a/andrew.mcnab/skatest/1.tar",
+                         "LFN:/skatelescope.eu/user/a/andrew.mcnab/skatest/2.tar",
+                         "LFN:/skatelescope.eu/user/a/andrew.mcnab/skatest/3.tar",
+                         "LFN:/skatelescope.eu/user/a/andrew.mcnab/skatest/4.tar",
+                         "LFN:/skatelescope.eu/user/a/andrew.mcnab/skatest/5.tar" };\n"""
+
+# Only run the jobs at Manchester
+jdl += 'Site = "LCG.UKI-NORTHGRID-MAN-HEP.uk";\n'	# in GridPP DIRAC
+#jdl += 'Site = "LCG.Manchester.uk";\n'			# in LHCb DIRAC
+#jdl += 'Site = "VAC.UKI-NORTHGRID-MAN-HEP.uk";\n'	# in GridPP DIRAC
+#jdl += 'Site = "VAC.Manchester.uk";\n'			# in LHCb DIRAC
+
+# Allows job to run on local queues (must correspond to tags in DIRAC CS!)
+# jdl += 'Tags = "manchester";\n;
+
+# The script you want to run. 
+jdl += 'Executable = "tarJob.sh";\n'
+
+# 
+# %n is a counter increasing by one for each job in the list
+# %s is the parameter taken from the list given in Parameters = { ... }
+jdl += 'Arguments = "%n %s";\n'
+
+# Send the script you want to run (in this directory or give the full path to it)
+jdl += 'InputSandbox = { "tarJob.sh" };\n'
+
+# Tell DIRAC where to get your big input data files from
+jdl += 'InputData = "%s";\n'
+
+# Small files can be put in the output sandbox
+jdl += 'OutputSandbox = "wc.log";\n'
+
+# Files to be saved to your grid storage area in case they are large
+# %j is the unique DIRAC Job ID number
+# jdl += 'OutputData = "%j.wc.log";\n'
+
+# Give the OutputSE too if using OutputData:
+# jdl += 'OutputSE = "UKI-NORTHGRID-MAN-HEP-disk";\n'	# storage in GridPP DIRAC
+# jdl += 'OutputSE = "CERN-USER";\n'			# storage in LHCb DIRAC
+
+# Tell DIRAC how many seconds your job might run for 
+jdl += 'MaxCPUTime = 1000;\n'
+
+# Create a unique Job Group for this set of jobs
+try:
+  diracUsername = getProxyInfo()['Value']['username']
+except:
+  print 'Failed to get DIRAC username. No proxy set up?'
+  sys.exit(1)
+
+jobGroup = diracUsername + time.strftime('.%Y%m%d%H%M%S')
+jdl += 'JobGroup = "' + jobGroup + '";\n'
+
+
+print 'Will submit this DIRAC JDL:'
+print '====='
+print jdl
+print '====='
+print
+
+# Submit the job(s)
+dirac = Dirac()
+result = dirac.submit(jdl)
+
+print
+print '====='
+print
+print 'Attempting to submit job(s) in JobGroup ' + jobGroup
+print 'Submission Result: ',result
+print
+print '====='
+print
+print 'Retrieve output with  dirac-wms-job-get-output --JobGroup ' + jobGroup
+print
