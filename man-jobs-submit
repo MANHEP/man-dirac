@@ -82,18 +82,21 @@ print '====='
 print jdl
 print '====='
 print
-
 # Submit the job(s)
+print 'Attempting to submit job(s) in JobGroup ' + jobGroup
+print
 dirac = Dirac()
 result = dirac.submit(jdl)
-
 print
 print '====='
 print
-print 'Attempting to submit job(s) in JobGroup ' + jobGroup
 print 'Submission Result: ',result
 print
 print '====='
 print
-print 'Retrieve output with  dirac-wms-job-get-output --JobGroup ' + jobGroup
+
+if result['OK']:
+  print 'Retrieve output with  dirac-wms-job-get-output --JobGroup ' + jobGroup
+else:
+  print 'There was a problem submitting your job(s) - see above!!!'
 print
