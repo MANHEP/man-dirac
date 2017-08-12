@@ -3,7 +3,9 @@ Basic idea
 1. Edit man-jobs-submit to suit the script you want to run across your data
    files
 2. Make sure the data files are on grid storage (use dirac-dms-add-file)
-3. Run man-jobs-submit
+3. Run man-jobs-submit   The jobs will be created in a unique DIRAC JobGroup 
+   so you can find them more easily. The JobGroup name consists of your DIRAC
+   nickname then the current date and time.
 4. Use the DIRAC portal to see how they are getting on (you can select by
    JobGroup)
 5. Get the results with a command like:
@@ -12,6 +14,7 @@ Basic idea
    directories is created in a directory named after the JobGroup. If you
    run the command more than once, it uses the existing directories to keep
    track of what job outputs it has already fetched.
+   You can safely ignore warnings like "No jobs selected with date ..."
 6. Write a script to merge the outputs of your outputs in all those directories
    and run the script when they've all finished.
 
@@ -19,3 +22,33 @@ If your output files are big too, you need to use OutputData (see the example
 in man-jobs-submit) and fetch those files using dirac-wms-job-get-output-data
 or dirac-dms-get-file (you can give it a file containing a list of LFNs to
 fetch.)
+
+
+man-jobs-submit uses the example shell script tarJob.sh which records
+some things about the environment then unpacks a tar file in the working
+directory before doing a word count with wc of the file data.txt from
+the tar file. That wc log is then written to wc.log
+
+The six input files were created one by one like this:
+ echo "zero" > data.txt ; tar cvf 0.tar data.txt
+ dirac-dms-add-file /skatelescope.eu/user/a/andrew.mcnab/skatest/0.tar 0.tar UKI-NORTHGRID-MAN-HEP-disk
+
+The JDL options in man-jobs-submit provide the shell script with the input
+tar files from grid storage and save the wc.log into the output sandbox
+which you can retrieve when the job finishes. 
+
+They can be retrieved with something like this (depending on the JobGroup):
+ dirac-wms-job-get-output --JobGroup andrew.mcnab.20170811164806
+
+Each job output will be created as a subdirectory of the JobGroup directory
+(andrew.mcnab.20170811164806) that the command also creates. You can run
+the command multiple times to retrieve the outputs from your jobs as they
+finish. The command avoids downloading the same outputs more than once by
+checking to see if a job's subdirectory already exists.
+
+In the example, each of those subdirectories contains a wc.log output file, 
+so you can merge the output of all your jobs with  
+ cat andrew.mcnab.20170811164806/*/wc.log > merged.wc.log
+
+It should be possible to adapt this trivial example to most High Throughput
+Computing workflows.

@@ -52,8 +52,12 @@ jdl += 'InputSandbox = { "tarJob.sh" };\n'
 # Tell DIRAC where to get your big input data files from
 jdl += 'InputData = "%s";\n'
 
+# Direct stdout and stderr to files
+jdl += 'StdOutput = "StdOut"';
+jdl += 'StdOutput = "StdErr"';
+
 # Small files can be put in the output sandbox
-jdl += 'OutputSandbox = "wc.log";\n'
+jdl += 'OutputSandbox = {"StdOut", "StdErr", "wc.log"};\n'
 
 # Files to be saved to your grid storage area in case they are large
 # %j is the unique DIRAC Job ID number
