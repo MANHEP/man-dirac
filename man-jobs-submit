@@ -53,8 +53,8 @@ jdl += 'InputSandbox = { "tarJob.sh" };\n'
 jdl += 'InputData = "%s";\n'
 
 # Direct stdout and stderr to files
-jdl += 'StdOutput = "StdOut"';
-jdl += 'StdOutput = "StdErr"';
+jdl += 'StdOutput = "StdOut";\n';
+jdl += 'StdOutput = "StdErr";\n';
 
 # Small files can be put in the output sandbox
 jdl += 'OutputSandbox = {"StdOut", "StdErr", "wc.log"};\n'
