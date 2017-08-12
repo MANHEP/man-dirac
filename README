@@ -33,9 +33,9 @@ The six input files were created one by one like this:
  echo "zero" > data.txt ; tar cvf 0.tar data.txt
  dirac-dms-add-file /skatelescope.eu/user/a/andrew.mcnab/skatest/0.tar 0.tar UKI-NORTHGRID-MAN-HEP-disk
 
-The JDL options in man-jobs-submit provide the shell script with the input
-tar files from grid storage and save the wc.log into the output sandbox
-which you can retrieve when the job finishes. 
+The JDL options in man-jobs-submit provide the shell script in each job 
+with one of the input tar files from grid storage and save the wc.log into
+the output sandbox which you can retrieve when the job finishes. 
 
 They can be retrieved with something like this (depending on the JobGroup):
  dirac-wms-job-get-output --JobGroup andrew.mcnab.20170811164806

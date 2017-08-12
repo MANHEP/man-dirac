@@ -41,15 +41,18 @@ jdl += 'Site = "LCG.UKI-NORTHGRID-MAN-HEP.uk";\n'	# in GridPP DIRAC
 # The script you want to run. 
 jdl += 'Executable = "tarJob.sh";\n'
 
-# 
+# tarJob.sh will be run with these command line arguments
 # %n is a counter increasing by one for each job in the list
 # %s is the parameter taken from the list given in Parameters = { ... }
-jdl += 'Arguments = "%n %s";\n'
+# something is just a value to show you can add other things too
+jdl += 'Arguments = "%n %s something";\n'
 
-# Send the script you want to run (in this directory or give the full path to it)
+# Send the script you want to run (in this directory where you run man-job-submit
+# or give the full path to it)
 jdl += 'InputSandbox = { "tarJob.sh" };\n'
 
 # Tell DIRAC where to get your big input data files from
+# %s is the parameter taken from the list given in Parameters = { ... }
 jdl += 'InputData = "%s";\n'
 
 # Direct stdout and stderr to files
@@ -79,7 +82,6 @@ except:
 
 jobGroup = diracUsername + time.strftime('.%Y%m%d%H%M%S')
 jdl += 'JobGroup = "' + jobGroup + '";\n'
-
 
 print 'Will submit this DIRAC JDL:'
 print '====='
