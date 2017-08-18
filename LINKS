@@ -1,0 +1,33 @@
+Useful links
+============
+
+X.509 (Grid) Certificates
+-------------------------
+
+The "Request New User Certificate" form is here:
+ https://portal.ca.grid-support.ac.uk/caportal/
+ You will end up with an RSA private key and an X.509 user certificate, both
+ in PEM format. They should be named userkey.pem and usercert.pem and put in
+ $HOME/.globus/ on the Linux machine you intend to submit jobs from.
+
+You can create a .p12 file for importing into a web browser with:
+ openssl pkcs12 -export -in usercert.pem -inkey userkey.pem -out usercertkey.p12
+ On macOS, openssl silently fails if the passphrase is too short! (<= 4 chars??)
+
+GridPP DIRAC
+------------
+
+For skatelescope.eu    (SKA development)
+    vo.northgrid.ac.uk (local Manchester users)
+    gridpp             (testing)
+
+Quick Guide:
+ https://www.gridpp.ac.uk/wiki/Quick_Guide_to_Dirac
+ 
+Installation instructions which you can (almost) just copy and paste:
+ https://www.gridpp.ac.uk/wiki/Quick_Guide_to_Dirac#Dirac_client_installation
+
+GridPP DIRAC Portal:
+ https://dirac.gridpp.ac.uk/DIRAC/
+ This is very useful for monitoring your jobs' progress.
+
