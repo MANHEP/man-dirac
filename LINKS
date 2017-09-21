@@ -10,10 +10,28 @@ The "Request New User Certificate" form is here:
  in PEM format. They should be named userkey.pem and usercert.pem and put in
  $HOME/.globus/ on the Linux machine you intend to submit jobs from.
 
+You may need to convert PKCS8 private keys from the UK e-Science CA website to
+traditional format to get them to work some clients (including curl):
+ openssl pkcs8 -in userkey.old.pem -out userkey.new.pem
+
 You can create a .p12 file for importing into a web browser with:
  openssl pkcs12 -export -in usercert.pem -inkey userkey.pem -out usercertkey.p12
  On macOS, openssl silently fails if the passphrase is too short! (<= 4 chars??)
 
+VOMS
+----
+To use GridPP DIRAC you need to be in vo.northgrid.ac.uk or skatelescope.eu 
+(for LHCb DIRAC, membership is via your membership of LHCb.)
+
+With your certificate and key loaded in your browser, or the macOS KeyStore
+for Safari and Chrome, you can request vo.northgrid.ac.uk or skatelescope.eu 
+VO membership from 
+  https://voms.gridpp.ac.uk/ 
+(works from eduroam; may not be accessible from UoM_WIFI?)
+
+New members of those two VOs should be automatically added to GridPP DIRAC
+within a day (overnight?)
+ 
 GridPP DIRAC
 ------------
 
