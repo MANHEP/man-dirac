@@ -44,8 +44,9 @@ jdl += 'Executable = "tarJob.sh";\n'
 # tarJob.sh will be run with these command line arguments
 # %n is a counter increasing by one for each job in the list
 # %s is the parameter taken from the list given in Parameters = { ... }
+# %j is the unique DIRAC Job ID number
 # something is just a value to show you can add other things too
-jdl += 'Arguments = "%n %s something";\n'
+jdl += 'Arguments = "%n %s %j something";\n'
 
 # Send the script you want to run (in this directory where you run man-job-submit
 # or give the full path to it)
@@ -60,11 +61,12 @@ jdl += 'StdOutput = "StdOut";\n';
 jdl += 'StdOutput = "StdErr";\n';
 
 # Small files can be put in the output sandbox
-jdl += 'OutputSandbox = {"StdOut", "StdErr", "wc.log"};\n'
+jdl += 'OutputSandbox = {"StdOut", "StdErr", "%j.wc.log"};\n'
 
 # Files to be saved to your grid storage area in case they are large
-# %j is the unique DIRAC Job ID number
-# jdl += 'OutputData = "%j.wc.log";\n'
+# %j is the unique DIRAC Job ID number. 
+# DIRAC looks for this output file in the working directory.
+# jdl += 'OutputData = "LFN:/skatelescope.eu/user/a/andrew.mcnab/tmp/%j.wc.log";\n'
 
 # Give the OutputSE too if using OutputData:
 # jdl += 'OutputSE = "UKI-NORTHGRID-MAN-HEP-disk";\n'	# storage in GridPP DIRAC

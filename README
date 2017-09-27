@@ -27,15 +27,16 @@ fetch.)
 man-jobs-submit uses the example shell script tarJob.sh which records
 some things about the environment then unpacks a tar file in the working
 directory before doing a word count with wc of the file data.txt from
-the tar file. That wc log is then written to wc.log
+the tar file. That wc log is then written to JOB_ID.wc.log where JOB_ID
+is the unique DIRAC Job ID.
 
 The six input files were created one by one like this:
  echo "zero" > data.txt ; tar cvf 0.tar data.txt
  dirac-dms-add-file /skatelescope.eu/user/a/andrew.mcnab/skatest/0.tar 0.tar UKI-NORTHGRID-MAN-HEP-disk
 
 The JDL options in man-jobs-submit provide the shell script in each job 
-with one of the input tar files from grid storage and save the wc.log into
-the output sandbox which you can retrieve when the job finishes. 
+with one of the input tar files from grid storage and save the JOB_ID.wc.log
+into the output sandbox which you can retrieve when the job finishes. 
 
 They can be retrieved with something like this (depending on the JobGroup):
  dirac-wms-job-get-output --JobGroup andrew.mcnab.20170811164806
@@ -48,7 +49,7 @@ checking to see if a job's subdirectory already exists.
 
 In the example, each of those subdirectories contains a wc.log output file, 
 so you can merge the output of all your jobs with  
- cat andrew.mcnab.20170811164806/*/wc.log > merged.wc.log
+ cat andrew.mcnab.20170811164806/*/*.wc.log > merged.wc.log
 
 It should be possible to adapt this trivial example to most High Throughput
 Computing workflows.
