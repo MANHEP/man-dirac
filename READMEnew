@@ -1,0 +1,188 @@
+THIS IS FOR MAF USERS AND NEEDS DE-MAFFING FOR SKA!
+
+
+Getting started with DIRAC job submission to MAF
+================================================
+
+This README explains how to use the example files in this directory to submit
+a test job to DIRAC and have it run on MAF at Manchester. For members of LHCb
+this is done using the LHCb virtual organization and LHCbDIRAC; for other 
+people it's done with the NorthGrid virtual organization and the GridPP DIRAC
+service.
+
+Get a grid certificates
+-----------------------
+(If you've already got a grid cerificate you can skip this section.)
+
+To use DIRAC to submit jobs you need a grid certificate. Go to the
+"Request New User Certificate" form here:
+ https://portal.ca.grid-support.ac.uk/caportal/
+and select Manchester HEP as the Registration Authority (RA). It talks
+you through the processor of creating a private key and submitting the
+certifiate request to the website. The PIN it asks for doesn't need to be 
+a strong password and won't be used again. However the passphrase should be
+a storng password and you need to remember it. Also, BE CAREFUL TO KEEP THE 
+PRIVATE KEY TEXT FILE IT GENERATES FOR YOU. If it's lost, you have to start 
+again. Once the request is submitted, you should contact Sabah
+( sabah.salih@manchester.ac.uk ) to get your request authorized by providing
+photographic ID (eg your university
+ID card.)
+
+The registration process will eventually produce a file in .p12 format saved
+to your computer. This contains your private key and your public certificate
+which you can use to prove your identify to DIRAC and to computers you might
+run on.
+
+Import the certificate/key to your web browser
+----------------------------------------------
+
+Even if you have a grid certificate, make sure that it's loaded into your
+web browser. It depends on your web browser how to do this: on Linux and
+Windows, you usually load it via the Settings/Preferences of the browser.
+For macOS, you usually load it into Keychain (see the Keychain Access app
+usually in the Other folder in the Launcher.) Most things now work best
+with the Google Chrome browser.
+
+To check your certificate is loaded look at this page: 
+https://viab.gridpp.ac.uk
+where you should see something like this in the box at the very bottom:
+"You are /C=UK/O=eScience/OU=Manchester/L=HEP/CN=andrew mcnab"
+
+VOMS
+----
+(If you are an LHCb member and registered in the LHCb VOMS and LHCbDIRAC
+you can skip this section.)
+
+To use GridPP DIRAC you need to be in the vo.northgrid.ac.uk virtual 
+organization. You can request vo.northgrid.ac.uk VO membership from 
+https://voms.gridpp.ac.uk/ That website may not be accessible from the 
+UoM_WIFI network, although eduroam, the campus network, and random ISPs
+seem ok. That page has a list of VOs and vo.northgrid.ac.uk is near the 
+bottom.
+
+Request membership and follow the instructions on the webpages and the
+emails it sends you. Make sure you are in the manchester group as well 
+as vo.northgrid.ac.uk itself. You can check by going to
+https://voms.gridpp.ac.uk:8443/voms/vo.northgrid.ac.uk/user/home.action
+and scrolling down to "Your groups and roles", which should have an
+entry for the group "/vo.northgrid.ac.uk/manchester"
+ 
+Convert certificate/key to PEM format
+-------------------------------------
+
+You received your grid certificate and key in the .p12 file, and loaded
+it into your web browser. To use DIRAC commands on a Linux machine, you
+also need to convert the certificate and key into PEM format, with these
+commands (where something.p12 is your .p12 file):
+
+  mkdir -p $HOME/.globus
+  openssl pkcs12 -in something.p12 -clcerts -nokeys -out $HOME/.globus/usercert.pem
+  openssl pkcs12 -in something.p12 -nocerts -out $HOME/.globus/userkey.pem
+  chmod 0400 userkey.pem
+
+When you are asked for your passphrase, again choose a strong password
+(it can be same one as you used as the passphrase during the registration
+process.)
+
+DIRAC commands look for these two files in the $HOME/.globus subdirectory
+with those filenames, so if you want to work from another Linux machine,
+you should recreate the $HOME/.globus directory and those two files. It's
+not necessary to reapply for a new certificate if you get a new notebook,
+go out to CERN etc.
+
+GridPP DIRAC for NorthGrid users
+--------------------------------
+
+This "DIRAC client installation" section of this page explains how to set up
+the GridPP DIRAC commands on your account on a Linux machine:
+https://www.gridpp.ac.uk/wiki/Quick_Guide_to_Dirac#Dirac_client_installation
+Use vo.northgrid.ac.uk instead of your_vo_goes_here in the commands.
+
+That page also explains how to submit a test job, but it does it as a normal
+grid user without access to the locally-funded Manchester resources in MAF.
+Carry on reading this README to see how to access MAF.
+
+LHCb DIRAC for LHCb members
+---------------------------
+
+The easiest place to use DIRAC commands for LHCb members is lxplus.cern.ch .
+Just log in as normal with your CERN account and most things are set up 
+automatically. Make sure $HOME/.globus is set up as described in "Convert
+certificate/key to PEM format" and then do these two commands:
+
+  lb-run LHCbDIRAC/latest bash 
+  lhcb-proxy-init
+
+lhcb-proxy-init will ask for the passphrase you gave when converting your
+private key from .p12 to PEM format.
+
+Job submission
+--------------
+This directory contains two files which you can use to submit a test job
+to DIRAC. They work for either flavour: GridPP+NorthGrid or LHCb.
+
+The first file is maf-test.sh which is a trivial shell script which will
+be run on the MAF machine your job lands on:
+
+  #!/bin/sh
+  printenv
+
+The second file is maf-test.jdl and describes the job to DIRAC:
+
+  JobName = "ChangeMe";
+  JobGroup = "ChangeMe";
+  InputSandbox = {"maf-test.sh"};
+  Executable = "maf-test.sh";
+  Arguments = "123";
+  StdOutput = "StdOut";
+  StdError = "StdErr";
+  OutputSandbox = {"StdOut","StdErr"};
+
+The InputSandbox tells DIRAC which file(s)
+you want to send with the job. In this case just maf-test.sh . The
+OutputSandbox line tells DIRAC which output files you want to bring back.
+In this case they will be the stdout and stderr of the maf-test.sh 
+script when it runs. You should change JobName and JobGroup to something
+short but specific to you. You can use this to keep track of which job
+is which when you are submitting lots of them!
+
+To submit the job to DIRAC do this:
+
+  dirac-wms-job-submit maf-test.jdl
+
+The command will output a number which is the JobID and used to refer
+to the job in the DIRAC system. You can see what the job is doing with
+
+  dirac-wms-job-status 1234567890
+
+(or whatever your JobID is.) It will probably start as Waiting. When it
+gets to Done, it's been run on MAF and has finished. You can get the
+OutputSandbox back with the command
+
+  dirac-wms-job-output 1234567890
+
+and it will be created as subdirectory of the current directory, using
+the JobID as the directory name. It should contain a file StdOut with
+a list of the environment variables from the machine the job ran on.
+
+DIRAC portal
+------------
+
+The DIRAC portal is a website which lets you view and manage your jobs.
+It's very useful once you have lots of jobs submitted. For 
+GridPP+NorthGrid the portal is here:
+
+  https://dirac.gridpp.ac.uk/DIRAC/
+
+For LHCb it's here:
+
+  https://lhcb-portal-dirac.cern.ch/DIRAC/
+
+In either case, to see your jobs select Job Monitor from the menu on
+the left hand side (in the Applications section.) By default the
+user should be your DIRAC username. For GridPP+NorthGrid it will be
+your first and last names; for LHCb, it will be your CERN account name.
+You can then see a list of your jobs, showing their state of Waiting,
+Running, Done etc. 
+
+
